@@ -1,12 +1,14 @@
 //Vehicle.java 
-package TrafficProject.CSE-561-TrafficProject;
+package TrafficProject.CSE_561_TrafficProject;
 
-
+import java.util.Random;
 import GenCol.*;
 
 
 import model.modeling.*;
+import model.simulation.*;
 
+import view.simView.*;
 
 public class Vehicle extends atomic{
 
@@ -32,7 +34,7 @@ public void  deltext(double e, message x){
     Continue(e);
     for(int i=0; i<x.getLength(); i++) {
 		if(messageOnPort(x, "newRoadSection", i)) {
-			val = x.getValOnPort("newRoadSection", i);
+			entity val = x.getValOnPort("newRoadSection", i);
 			turn = chooseTurn();
 			phase = "choiceMade";
 			holdIn("choiceMade", 5);//vehicle reevaluates choice every 5 seconds
@@ -62,14 +64,15 @@ public void deltcon(double e, message x) {
 //Output Function:
 public message out(){
 	message m = new message();
-	content con = new content("turn", new entity(turn));
+	content con = new content("turn", new entity("" + turn));
 	m.add(con);
     return m;
 }
  
  public int chooseTurn() {
 	 //turn becomes random number between 0-2
-	 return 0;
+	 Random r = new Random();
+	 return r.nextInt(3);
  }
  
  public int getTurn() {
@@ -79,4 +82,3 @@ public message out(){
 
 
 }
-
