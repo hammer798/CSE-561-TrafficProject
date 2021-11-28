@@ -1,4 +1,4 @@
-package TrafficProject.CSE_561_TrafficProject;
+package Component.Project;
 
 import java.util.Random;
 import GenCol.*;
@@ -83,4 +83,5 @@ public class TrafficLight extends atomic{
 
 
 }
+
 

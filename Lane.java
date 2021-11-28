@@ -1,5 +1,4 @@
-//Lane.java 
-package TrafficProject.CSE_561_TrafficProject;
+package Component.Project;
 
 import java.util.ArrayList;
 import GenCol.*;
@@ -12,7 +11,8 @@ import view.simView.*;
 public class Lane extends atomic{
 
 	int capacity = 40; //check notes for actual number-lanes modelled as 1/8 mile section of road
-	int currentSignal = 0; //0 is red, 1 is green, 2 is left turn, street will convert this from traffic light
+	int currentSignal = -1; //0 is red, 1 is green, 2 is left turn, street will convert this from traffic light
+	int leftVol=0, straightVol=0, rightVol=0;
 	ArrayList<Vehicle> cars;
 	
 	public Lane(){
@@ -36,6 +36,21 @@ public class Lane extends atomic{
 	//External Transition Function
 	public void  deltext(double e, message x){
 	    Continue(e);
+	    for(int i=0; i<x.getLength(); i++) {
+	    	if(messageOnPort(x, "streetCapacities", i)) {
+	    		entity val = x.getValOnPort("streetCapacities", i);
+	    		String value = val.getName();
+	    		for(int nums = 0; nums < value.split("/").length; nums++) {
+	    			if(nums == 0)
+	    				leftVol = Integer.parseInt(value.split("/")[nums]);
+	    			else if(nums == 1)
+	    				straightVol = Integer.parseInt(value.split("/")[nums]);
+	    			else{
+	    				rightVol = Integer.parseInt(value.split("/")[nums]);
+	    			}
+	    		}
+	    	}
+	    }
 	    for(int i=0; i<x.getLength(); i++) {
 			if(messageOnPort(x, "newCar", i)) {
 				entity val = x.getValOnPort("newCar", i);
@@ -72,7 +87,9 @@ public class Lane extends atomic{
 	public message out(){
 		message m = new message();
 		int chosenTurn = cars.get(0).getTurn();
-		if((currentSignal == 1 && (chosenTurn == 1 || chosenTurn == 2) || (currentSignal == 2 && chosenTurn == 0))){ //basically, does current traffic light match turn choice, will add capacity checks once implemented in traffic light
+		if(currentSignal == -1 || (currentSignal == 1 && ((chosenTurn == 1 && straightVol < capacity)||( rightVol < capacity && chosenTurn == 2)) || (currentSignal == 2 && chosenTurn == 0 && leftVol < capacity))){ //basically, does current traffic light match turn choice
+			if(currentSignal == -1)
+				chosenTurn = 1;
 			content con = new content("exitingCar", new entity("" + chosenTurn)); //pass turn so light knows where to send it
 			cars.remove(0);
 			phase = "notFull";
@@ -87,3 +104,4 @@ public class Lane extends atomic{
 
 
 }
+
