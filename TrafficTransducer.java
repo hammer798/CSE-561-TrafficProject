@@ -34,7 +34,7 @@ public class TrafficTransducer extends atomic{
 				}
 			}
 		}
-		if(count < 1000) {
+		if(count < 400) {
 			holdIn(phase, INFINITY);
 		}
 		else {
